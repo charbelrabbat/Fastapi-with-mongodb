@@ -7,7 +7,7 @@ from datetime import datetime
 import os
 
 # Use MongoDB Atlas connection from environment variable
-MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://rabbat:<db_password>@cluster0.3q4r6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://rabbat:ChelseaPass@2022@1111558811@cluster0.3q4r6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 
 client = MongoClient(MONGO_URI)
 db = client['userDB']
