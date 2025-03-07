@@ -4,23 +4,23 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pymongo import MongoClient
 from datetime import datetime
+import os
 
-# MongoDB setup
-client = MongoClient('mongodb://localhost:27017/')
+# Use MongoDB Atlas connection from environment variable
+MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://rabbat:<db_password>@cluster0.3q4r6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+
+client = MongoClient(MONGO_URI)
 db = client['userDB']
 collection = db['users']
 
-# FastAPI app and templates setup
 app = FastAPI()
 
-# Mount the static directory for CSS, images, etc.
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    # Fetch users from MongoDB
     users = collection.find()
     return templates.TemplateResponse("index.html", {"request": request, "users": users})
 
@@ -29,7 +29,6 @@ async def add_user(name: str = Form(...), age: str = Form(...), city: str = Form
     if not name or not age or not city:
         raise HTTPException(status_code=400, detail="All fields are required")
 
-    # Add user data to MongoDB with current date
     user_data = {
         "name": name,
         "age": age,
@@ -42,7 +41,6 @@ async def add_user(name: str = Form(...), age: str = Form(...), city: str = Form
 
 @app.post("/delete_user/")
 async def delete_user(name: str = Form(...)):
-    # Delete the user from MongoDB
     result = collection.delete_one({"name": name})
     
     if result.deleted_count == 0:
